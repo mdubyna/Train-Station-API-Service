@@ -36,8 +36,7 @@ class Train(models.Model):
         ordering = ["cargo_num"]
 
     def __str__(self) -> str:
-        return (f"{self.name} ({self.train_type}):"
-                f" cargo - {self.cargo_num}, places - {self.places_in_cargo}")
+        return self.name
 
 
 class Station(models.Model):
@@ -46,19 +45,19 @@ class Station(models.Model):
     longitude = models.DecimalField(max_digits=9, decimal_places=5)
 
     def __str__(self) -> str:
-        return f"{self.name}"
+        return self.name
 
 
 class Route(models.Model):
     source_station = models.ForeignKey(
         Station,
         on_delete=models.CASCADE,
-        related_name="routes"
+        related_name="source_route"
     )
     destination_station = models.ForeignKey(
         Station,
         on_delete=models.CASCADE,
-        related_name="routes"
+        related_name="destination_route"
     )
     distance = models.PositiveIntegerField()
 
@@ -85,7 +84,7 @@ class Trip(models.Model):
         ordering = ["departure_time"]
 
     def __str__(self) -> str:
-        return f"{self.train.name} - {self.departure_time}"
+        return f"{str(self.route)} {self.train.name} - {self.departure_time}"
 
 
 class Order(models.Model):
