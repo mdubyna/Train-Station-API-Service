@@ -8,6 +8,10 @@ class Crew(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
 
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
     class Meta:
         ordering = ["last_name"]
 
@@ -16,14 +20,14 @@ class Crew(models.Model):
 
 
 class TrainType(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
 
     def __str__(self) -> str:
         return self.name
 
 
 class Train(models.Model):
-    name = models.CharField(max_length=255)
+    name = models.CharField(max_length=255, unique=True)
     cargo_num = models.PositiveIntegerField()
     places_in_cargo = models.PositiveIntegerField(default=50)
     train_type = models.ForeignKey(
@@ -44,6 +48,10 @@ class Station(models.Model):
     latitude = models.DecimalField(max_digits=9, decimal_places=5)
     longitude = models.DecimalField(max_digits=9, decimal_places=5)
 
+    class Meta:
+        unique_together = ("name", "latitude", "longitude")
+        ordering = ("name",)
+
     def __str__(self) -> str:
         return self.name
 
@@ -60,6 +68,26 @@ class Route(models.Model):
         related_name="destination_route"
     )
     distance = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = ("source_station", "destination_station")
+        ordering = ("source_station__name",)
+
+    @staticmethod
+    def validate_route(source, destination, error_to_raise):
+        if destination == source:
+            raise error_to_raise("Station cannot have the same destination station")
+
+    def clean(self) -> None:
+        self.validate_route(self.source_station, self.destination_station, ValidationError)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        super(Route, self).save(*args, **kwargs)
+
+    @property
+    def route_name(self) -> str:
+        return f"{self.source_station} - {self.destination_station}"
 
     def __str__(self) -> str:
         return f"{self.source_station} - {self.destination_station} ({self.distance} km)"
@@ -81,6 +109,7 @@ class Trip(models.Model):
     arrival_time = models.DateTimeField()
 
     class Meta:
+        unique_together = ("route", "train")
         ordering = ["departure_time"]
 
     def __str__(self) -> str:
