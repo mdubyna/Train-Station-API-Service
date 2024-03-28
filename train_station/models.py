@@ -44,12 +44,12 @@ class Train(models.Model):
 
 
 class Station(models.Model):
-    name = models.CharField(max_length=255)
-    latitude = models.DecimalField(max_digits=9, decimal_places=5)
-    longitude = models.DecimalField(max_digits=9, decimal_places=5)
+    name = models.CharField(max_length=255, unique=True)
+    latitude = models.DecimalField(max_digits=20, decimal_places=18)
+    longitude = models.DecimalField(max_digits=20, decimal_places=17)
 
     class Meta:
-        unique_together = ("name", "latitude", "longitude")
+        unique_together = ("latitude", "longitude")
         ordering = ("name",)
 
     def __str__(self) -> str:
