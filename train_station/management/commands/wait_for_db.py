@@ -1,20 +1,20 @@
-import socket
-
-from django.core.management.base import BaseCommand, CommandError
+import time
+from django.db import connections
+from django.db.utils import OperationalError
+from django.core.management import BaseCommand
 
 
 class Command(BaseCommand):
+    """Django command to pause execution until db is available"""
 
     def handle(self, *args, **options):
-        print("Waiting for DB")
-        try:
-            check_socket = socket.create_connection(("db", 5432), 5)
-            check_socket.close()
-            self.stdout.write(
-                self.style.SUCCESS("DB runs successfully")
-            )
-            return
-        except socket.error as e:
-            print(e)
+        self.stdout.write("Waiting for database...")
+        db_conn = None
+        while not db_conn:
+            try:
+                db_conn = connections["default"]
+            except OperationalError:
+                self.stdout.write("Database unavailable, waiting 1 second...")
+                time.sleep(1)
 
-        raise CommandError("DB doesn't exist")
+        self.stdout.write(self.style.SUCCESS("Database available!"))
