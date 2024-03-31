@@ -159,7 +159,7 @@ class AdminStationTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
-            email="admin@test.com",
+            email="admin@tests.com",
             password="test_password",
             is_staff=True
         )

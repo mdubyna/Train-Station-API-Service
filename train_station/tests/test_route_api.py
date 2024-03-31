@@ -99,7 +99,7 @@ class AuthenticatedRouteApiTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
-            email="test@test.com",
+            email="tests@tests.com",
             password="test_password"
         )
         self.client.force_authenticate(self.user)
@@ -166,7 +166,7 @@ class AdminRouteTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
-            email="admin@test.com",
+            email="admin@tests.com",
             password="test_password",
             is_staff=True
         )

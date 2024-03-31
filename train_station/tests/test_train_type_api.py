@@ -33,14 +33,14 @@ class AuthenticatedTrainTypeApiTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
-            email="test@test.com",
+            email="tests@tests.com",
             password="test_password"
         )
         self.client.force_authenticate(self.user)
 
     def test_list_train_type_forbidden(self):
         TrainType.objects.create(
-            name="test"
+            name="tests"
         )
 
         res = self.client.get(TRAIN_TYPE_URL)
@@ -52,7 +52,7 @@ class AdminTrainTypeTest(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
-            email="admin@test.com",
+            email="admin@tests.com",
             password="test_password",
             is_staff=True
         )
@@ -60,7 +60,7 @@ class AdminTrainTypeTest(TestCase):
 
     def test_list_train_type_admin(self):
         TrainType.objects.create(
-            name="test"
+            name="tests"
         )
 
         res = self.client.get(TRAIN_TYPE_URL)
@@ -71,13 +71,13 @@ class AdminTrainTypeTest(TestCase):
         self.assertEqual(res.data["results"], serializer.data)
 
     def test_create_train_type(self):
-        res = self.client.post(TRAIN_TYPE_URL, {"name": "test"})
+        res = self.client.post(TRAIN_TYPE_URL, {"name": "tests"})
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
     def test_delete_train_type(self):
         train_type = TrainType.objects.create(
-            name="test"
+            name="tests"
         )
 
         res = self.client.delete(detail_url(train_type.id))
