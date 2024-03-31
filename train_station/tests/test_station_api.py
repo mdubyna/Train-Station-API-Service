@@ -4,14 +4,9 @@ from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
-from train_station.models import (
-    Station,
-    Station,
-    Route,
-    Station,
-    Crew,
-)
+from train_station.models import Station
 from train_station.serializers import StationSerializer
+
 
 STATION_URL = reverse("train_station:station-list")
 
