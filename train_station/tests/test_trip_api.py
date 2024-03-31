@@ -64,14 +64,20 @@ def sample_trip(**kwargs) -> Trip:
         "arrival_time": ARRIVAL_TIME
     }
     trip_data.update(kwargs)
-    return Trip.objects.create(**trip_data)
+    trip = Trip.objects.create(**trip_data)
+    crew = Crew.objects.create(
+            first_name="John",
+            last_name="Smith"
+        )
+    trip.crew.add(crew)
+    return trip
 
 
-class UnauthenticatedMovieApiTest(TestCase):
+class UnauthenticatedTripApiTest(TestCase):
     def setUp(self):
         self.client = APIClient()
 
-    def test_list_trip_anon_client(self):
+    def test_list_trip_unauthorized(self):
         sample_trip()
 
         res = self.client.get(TRIP_URL)
@@ -81,7 +87,7 @@ class UnauthenticatedMovieApiTest(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data["results"], serializer.data)
     
-    def test_retrieve_trip_anon_client(self):
+    def test_retrieve_trip_unauthorized(self):
         trip = sample_trip()
 
         res = self.client.get(detail_url(trip.id))
