@@ -2,7 +2,16 @@ from django.db import transaction
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
-from train_station.models import TrainType, Train, Station, Route, Crew, Trip, Ticket, Order
+from train_station.models import (
+    TrainType,
+    Train,
+    Station,
+    Route,
+    Crew,
+    Trip,
+    Ticket,
+    Order
+)
 
 
 class TrainTypeSerializer(serializers.ModelSerializer):
@@ -143,4 +152,3 @@ class OrderSerializer(serializers.ModelSerializer):
 
 class OrderListSerializer(OrderSerializer):
     tickets = TicketListSerializer(many=True, read_only=True)
-

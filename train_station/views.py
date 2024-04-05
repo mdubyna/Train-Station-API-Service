@@ -2,7 +2,15 @@ from rest_framework import mixins, viewsets
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.viewsets import GenericViewSet
 
-from train_station.models import TrainType, Train, Station, Route, Crew, Trip, Order
+from train_station.models import (
+    TrainType,
+    Train,
+    Station,
+    Route,
+    Crew,
+    Trip,
+    Order
+)
 from train_station.serializers import (
     TrainTypeSerializer,
     TrainSerializer,
@@ -49,7 +57,10 @@ class StationViewSet(viewsets.ModelViewSet):
 
 
 class RouteViewSet(viewsets.ModelViewSet):
-    queryset = Route.objects.select_related("source_station", "destination_station")
+    queryset = Route.objects.select_related(
+        "source_station",
+        "destination_station"
+    )
     serializer_class = RouteSerializer
 
     def get_serializer_class(self):
@@ -71,7 +82,8 @@ class CrewViewSet(viewsets.ModelViewSet):
 
 
 class TripViewSet(viewsets.ModelViewSet):
-    queryset = Trip.objects.select_related("train", "route").prefetch_related("crew")
+    queryset = (Trip.objects.select_related("train", "route")
+                .prefetch_related("crew"))
     serializer_class = TripSerializer
 
     def get_serializer_class(self):
