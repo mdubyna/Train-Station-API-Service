@@ -49,7 +49,12 @@ class Station(models.Model):
     longitude = models.DecimalField(max_digits=20, decimal_places=17)
 
     class Meta:
-        unique_together = ("latitude", "longitude")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["latitude", "longitude"],
+                name="unique station"
+            )
+        ]
         ordering = ("name",)
 
     def __str__(self) -> str:
@@ -60,26 +65,37 @@ class Route(models.Model):
     source_station = models.ForeignKey(
         Station,
         on_delete=models.CASCADE,
-        related_name="source_route"
+        related_name="source_routes"
     )
     destination_station = models.ForeignKey(
         Station,
         on_delete=models.CASCADE,
-        related_name="destination_route"
+        related_name="destination_routes"
     )
     distance = models.PositiveIntegerField()
 
     class Meta:
-        unique_together = ("source_station", "destination_station")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["source_station", "destination_station"],
+                name="unique route"
+            )
+        ]
         ordering = ("source_station__name",)
 
     @staticmethod
     def validate_route(source, destination, error_to_raise):
         if destination == source:
-            raise error_to_raise("Station cannot have the same destination station")
+            raise error_to_raise(
+                "Station cannot have the same destination station"
+            )
 
     def clean(self) -> None:
-        self.validate_route(self.source_station, self.destination_station, ValidationError)
+        self.validate_route(
+            self.source_station,
+            self.destination_station,
+            ValidationError
+        )
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -90,7 +106,9 @@ class Route(models.Model):
         return f"{self.source_station} - {self.destination_station}"
 
     def __str__(self) -> str:
-        return f"{self.source_station} - {self.destination_station} ({self.distance} km)"
+        return (f"{self.source_station} -"
+                f" {self.destination_station}"
+                f" ({self.distance} km)")
 
 
 class Trip(models.Model):
@@ -109,7 +127,12 @@ class Trip(models.Model):
     arrival_time = models.DateTimeField()
 
     class Meta:
-        unique_together = ("route", "train")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["route", "train"],
+                name="unique trip"
+            )
+        ]
         ordering = ["departure_time"]
 
     def __str__(self) -> str:
@@ -146,7 +169,12 @@ class Ticket(models.Model):
     )
 
     class Meta:
-        unique_together = ("trip", "cargo", "seat")
+        constraints = [
+            models.UniqueConstraint(
+                fields=["trip", "cargo", "seat"],
+                name="unique ticket"
+            )
+        ]
         ordering = ["cargo", "seat"]
 
     @staticmethod
